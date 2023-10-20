@@ -3,6 +3,7 @@ import requests
 import socket
 import concurrent.futures
 
+os.system('clear')
 
 def banner(text):
     purple_text = "\033[94m" + text + "\033[0m"
