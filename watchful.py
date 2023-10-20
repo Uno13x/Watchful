@@ -3,7 +3,6 @@ import requests
 import socket
 import concurrent.futures
 
-os.system('clear')
 
 def banner(text):
     purple_text = "\033[94m" + text + "\033[0m"
@@ -18,9 +17,10 @@ W W   W W  A   A   T   C     C  H   H  F      U   U  L
 """
 
 banner(text)
-print("\033[94m___________________Create by Uno 1.0_____________________")
+print("\033[94m___________________Create by Uno 1.1_____________________")
 
-ip = input("\033[94mInsira o IP que deseja escanear: ")
+ip = input("\033[94mInsira o IP que deseja rastrear: ")
+
 
 def is_valid_ip(ip):
     try:
@@ -33,10 +33,12 @@ def is_valid_ip(ip):
         except socket.error:
             return None
 
+
 def is_private_ip(ip):
     try:
         ip_bytes = socket.inet_pton(socket.AF_INET, ip)
-        if ip_bytes.startswith(b'\x0A') or ip_bytes.startswith(b'\x7F') or (b'\xC0A8' <= ip_bytes < b'\xC0B0') or (b'\xA9FE' <= ip_bytes < b'\xA9FF'):
+        if ip_bytes.startswith(b'\x0A') or ip_bytes.startswith(b'\x7F') or (b'\xC0A8' <= ip_bytes < b'\xC0B0') or (
+                b'\xA9FE' <= ip_bytes < b'\xA9FF'):
             return True
     except socket.error:
         try:
@@ -47,6 +49,7 @@ def is_private_ip(ip):
             return False
     return False
 
+
 def convert_to_ipv6(ip):
     try:
         ipv4_bytes = socket.inet_pton(socket.AF_INET, ip)
@@ -55,6 +58,7 @@ def convert_to_ipv6(ip):
     except socket.error:
         return ip
 
+
 def convert_to_ipv4(ip):
     try:
         ipv6_bytes = socket.inet_pton(socket.AF_INET6, ip)
@@ -62,6 +66,7 @@ def convert_to_ipv4(ip):
         return socket.inet_ntop(socket.AF_INET, ipv4_bytes)
     except socket.error:
         return ip
+
 
 def is_public_ip(ip):
     try:
@@ -72,6 +77,7 @@ def is_public_ip(ip):
             return True
     except Exception as e:
         return False
+
 
 def get_ip_info(ip):
     try:
@@ -85,6 +91,7 @@ def get_ip_info(ip):
         print(f"\033[94mErro ao obter informações do IP: {e}\033[0m")
     return None
 
+
 def check_web_service_status(ip, port):
     url = f'http://{ip}:{port}'
     try:
@@ -96,12 +103,14 @@ def check_web_service_status(ip, port):
     except requests.exceptions.RequestException:
         return "Não foi possível conectar"
 
+
 def get_dns_info(ip):
     try:
         host_info = socket.gethostbyaddr(ip)
         return host_info
     except socket.herror:
         return None
+
 
 def scan_port(ip, port):
     try:
@@ -114,12 +123,14 @@ def scan_port(ip, port):
         pass
     return None
 
+
 def scan_ports(ip, ports):
     open_ports = []
     with concurrent.futures.ThreadPoolExecutor() as executor:
         results = list(executor.map(lambda port: scan_port(ip, port), ports))
         open_ports = [port for port in results if port is not None]
     return open_ports
+
 
 def check_blacklists(ip):
     blacklists = [
@@ -142,6 +153,7 @@ def check_blacklists(ip):
         except Exception as e:
             print(f"\033[94mNão foi possível verificar a blacklist {blacklist}: {e}\033[0m")
 
+
 def format_ipv4_and_ipv6(ip, version):
     if version == "IPv4":
         ipv6_equivalent = convert_to_ipv6(ip)
@@ -152,16 +164,6 @@ def format_ipv4_and_ipv6(ip, version):
     else:
         return f"IP inválido: {ip}"
 
-def get_internal_ip():
-    try:
-        internal_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        internal_socket.settimeout(0.1)
-        internal_socket.connect(("10.0.0.0", 80))
-        internal_ip = internal_socket.getsockname()[0]
-        internal_socket.close()
-        return internal_ip
-    except Exception as e:
-        return None
 
 if __name__ == "__main__":
     version = is_valid_ip(ip)
@@ -172,15 +174,7 @@ if __name__ == "__main__":
 
     is_public = is_public_ip(ip)
 
-    internal_ip = get_internal_ip()
-    if internal_ip:
-        print(f"IP interno do seu dispositivo: {internal_ip}")
-        if is_private_ip(internal_ip):
-            print("Tipo de conexão: Privada")
-        else:
-            print("Tipo de conexão: Pública")
-    else:
-        print("Não foi possível determinar o IP interno do dispositivo.")
+    internal_ip = get_ip_info(ip).get('ip', 'IP interno não disponível')
 
     if is_public:
         ip_info = get_ip_info(ip)
