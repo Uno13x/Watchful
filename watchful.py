@@ -19,7 +19,7 @@ W W   W W  A   A   T   C     C  H   H  F      U   U  L
 banner(text)
 print("\033[94m___________________Create by Uno 1.1_____________________")
 
-ip = input("\033[94mInsira o IP que deseja rastrear: ")
+ip = input("\033[94mInsira o IP que deseja escanear: ")
 
 
 def is_valid_ip(ip):
